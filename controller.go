@@ -22,7 +22,7 @@ type ControllerInterface interface {
 	RouteName() string //rewrite resource name in route url
 	ParentNode() ControllerInterface
 
-	init(r ControllerInterface)
+	Init(r ControllerInterface)
 	model() ResourceInterface
 	modelSlice() interface{}
 	parentController() ControllerInterface
@@ -43,7 +43,7 @@ type Controller struct {
 	RestModelSlice   func() interface{} //https://golang.org/doc/faq#convert_slice_of_interface
 	*EmptyController
 }
-func (action *Controller) init(r ControllerInterface){
+func (action *Controller) Init(r ControllerInterface){
 	if r == nil {
 		panic(errors.New("param r: is not a controller"))
 	}
