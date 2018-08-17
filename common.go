@@ -19,7 +19,7 @@ func ReturnSuccess(c *gin.Context, code int, data interface{}) {
 	c.JSON(code, js)
 }
 
-func MapUrlQuery(condition map[string]interface{}, query url.Values, obj interface{})  map[string]interface{}{
+func MergeUrlCondition(condition map[string]interface{}, query url.Values, obj interface{}){
 	t := reflect.TypeOf(obj)
 	v := reflect.ValueOf(obj)
 	if v.Kind() == reflect.Ptr {
@@ -43,7 +43,6 @@ func MapUrlQuery(condition map[string]interface{}, query url.Values, obj interfa
 			condition[nm] = p
 		}
 	}
-	return  condition
 }
 
 // 驼峰式写法转为下划线写法

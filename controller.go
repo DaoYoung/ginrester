@@ -45,7 +45,7 @@ type Controller struct {
 }
 func (action *Controller) init(r ControllerInterface){
 	if r == nil {
-		panic(NOContentError(errors.New("param r: is not a controller")))
+		panic(errors.New("param r: is not a controller"))
 	}
 	action.Rester = r
 	action.RestModel = r.model
@@ -71,7 +71,7 @@ func (action *Controller) Create(c *gin.Context) {
 	obj := action.RestModel()
 	err := c.BindJSON(obj)
 	if err != nil {
-		panic(JsonTypeError(err))
+		panic(err)
 	}
 	action.Rester.beforeCreate(c, obj)
 	info := Create(obj)
@@ -93,7 +93,7 @@ func (action *Controller) List(c *gin.Context) {
 	}
 	obj := action.RestModelSlice()
 	condition := action.Rester.listCondition(c)
-	condition = MapUrlQuery(condition, c.Request.URL.Query(), action.RestModel())
+	MergeUrlCondition(condition, c.Request.URL.Query(), action.RestModel())
 	FindListByMap(obj, condition, "id desc", page, PerPage)
 	ReturnSuccess(c, http.StatusOK, obj)
 }
@@ -102,18 +102,18 @@ func (action *Controller) Update(c *gin.Context) {
 	obj := action.RestModel()
 	err := c.BindJSON(obj)
 	if err != nil {
-		panic(JsonTypeError(err))
+		panic(err)
 	}
 	condition := action.Rester.updateCondition(c, GetRouteID(action.Rester))
 	if val, ok := condition["id"]; ok {
 		old := FindOneByID(action.RestModel(), val.(int))
-		CheckupdateCondition(old, condition)
+		CheckUpdateCondition(old, condition)
 		action.Rester.beforeUpdate(c, old, obj)
 		info := UpdateByID(val.(int), obj)
 		action.Rester.afterUpdate(c, old, info)
 		ReturnSuccess(c, http.StatusOK, info)
 	}else {
-		panic(NOChangeError(errors.New("can't find data to update")))
+		panic(errors.New("can't find data to update"))
 	}
 }
 func (action *Controller) Delete(c *gin.Context) {

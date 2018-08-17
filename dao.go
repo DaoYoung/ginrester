@@ -2,7 +2,6 @@ package gorester
 
 import (
 	"strconv"
-	"github.com/jinzhu/gorm"
 	"time"
 	"errors"
 )
@@ -46,14 +45,12 @@ func (bf ForbidUpdateResource) ForbidUpdate() bool {
 	return true
 }
 
-
-
 func FindOneByID(res ResourceInterface, id int) ResourceInterface {
 
 	if err := Db.Where("id = ?", id).Last(res).Error; err == nil {
 		return res
 	} else {
-		panic(NotFoundDaoError(errors.New("ByID:(" + strconv.Itoa(id) + ") data not found ")))
+		panic(errors.New("ByID:(" + strconv.Itoa(id) + ") data not found "))
 	}
 }
 

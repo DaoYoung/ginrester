@@ -11,13 +11,13 @@ import (
 type EmptyController struct{}
 
 func (this EmptyController) Rester() {
-	panic(NOContentError(errors.New("can't find func:Rester in your controller")))
+	panic(errors.New("can't find func:Rester in your controller"))
 }
 func (this EmptyController) modelSlice() interface{} {
-	panic(NOContentError(errors.New("can't find func:modelSlice in your controller")))
+	panic(errors.New("can't find func:modelSlice in your controller"))
 }
 func (this *EmptyController) model() ResourceInterface {
-	panic(NOContentError(errors.New("can't find func:model in your controller")))
+	panic(errors.New("can't find func:model in your controller"))
 }
 func (this *EmptyController) parentController() ControllerInterface                           { return nil }
 func (this *EmptyController) beforeCreate(c *gin.Context, m ResourceInterface)                     {}
@@ -33,7 +33,7 @@ func (this *EmptyController) updateCondition(c *gin.Context, pk string) map[stri
 	condition := make(map[string]interface{})
 	id, err := strconv.Atoi(c.Param(pk))
 	if err != nil {
-		panic(NOContentError(errors.New("can't Update without ID")))
+		panic(errors.New("can't Update without ID"))
 	}
 	condition["id"] = id
 	return condition
@@ -55,7 +55,7 @@ func GetRouteID(controller ControllerInterface) (routeId string) {
 	}
 	return
 }
-func CheckupdateCondition(m ResourceInterface, condition map[string]interface{}) {
+func CheckUpdateCondition(m ResourceInterface, condition map[string]interface{}) {
 	v := reflect.ValueOf(m)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -65,16 +65,16 @@ func CheckupdateCondition(m ResourceInterface, condition map[string]interface{})
 		switch old.Kind() {
 		case reflect.String:
 			if old.String() != val {
-				panic(ForbidError(errors.New("forbid update by field:" + key)))
+				panic(errors.New("forbid update by field:" + key))
 			}
 			break
 		case reflect.Int:
 			if old.Int() != int64(val.(int)) {
-				panic(ForbidError(errors.New("forbid update by field:" + key)))
+				panic(errors.New("forbid update by field:" + key))
 			}
 			break
 		default:
-			panic(ForbidError(errors.New("forbid update by field type:" + old.Kind().String())))
+			panic(errors.New("forbid update by field type:" + old.Kind().String()))
 		}
 	}
 }
