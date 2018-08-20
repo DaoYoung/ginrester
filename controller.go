@@ -1,4 +1,4 @@
-package gorester
+package ginrester
 
 import (
 	"github.com/gin-gonic/gin"

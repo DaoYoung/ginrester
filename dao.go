@@ -1,4 +1,4 @@
-package gorester
+package ginrester
 
 import (
 	"strconv"
