@@ -2,10 +2,9 @@ package gorester
 
 import (
 	"github.com/gin-gonic/gin"
-	"strings"
 )
 
-func CreateRestRoutes(group *gin.RouterGroup, controller ControllerInterface, actions ...string) {
+func CreateRoutes(group *gin.RouterGroup, controller ControllerInterface, actions ...string) {
 	path, resourceName, routeId := BuildRoute(controller)
 	if isContain(actions, "list") {
 		group.GET(path+"/"+resourceName, controller.List)
@@ -23,13 +22,15 @@ func CreateRestRoutes(group *gin.RouterGroup, controller ControllerInterface, ac
 		group.DELETE(path+"/"+resourceName+"/:"+routeId, controller.Delete)
 	}
 }
-
-func isContain(strSlice []string, searchStr string) bool {
-	if len(strSlice) == 0 {
-		return true
+func BuildRoute(controller ControllerInterface) (path, resourceName, routeId string) {
+	if controller.ParentNode() != nil {
+		pp, pr, pi := BuildRoute(controller.ParentNode())
+		path = pp + "/" + pr + "/:" + pi
 	}
-	str := strings.Join(strSlice,",")
-	return strings.Contains(str, searchStr)
+	resourceName = controller.RouteName() + "s"
+	routeId = GetRouteID(controller)
+	return
 }
+
 
 

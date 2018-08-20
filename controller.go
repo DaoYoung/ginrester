@@ -8,6 +8,7 @@ import (
 	"strings"
 	"errors"
 	"github.com/jinzhu/gorm"
+	"net/url"
 )
 var Db *gorm.DB
 var PerPage =20
@@ -41,7 +42,7 @@ type Controller struct {
 	Rester           ControllerInterface
 	RestModel        func() ResourceInterface
 	RestModelSlice   func() interface{} //https://golang.org/doc/faq#convert_slice_of_interface
-	*EmptyController
+	*BaseController
 }
 func (action *Controller) Init(r ControllerInterface){
 	if r == nil {
@@ -123,4 +124,52 @@ func (action *Controller) Delete(c *gin.Context) {
 	DeleteByID(obj, id)
 	action.Rester.afterDelete(c,obj, id)
 	ReturnSuccess(c, http.StatusOK, gin.H{"id": id})
+}
+func MergeUrlCondition(condition map[string]interface{}, query url.Values, obj interface{}){
+	t := reflect.TypeOf(obj)
+	v := reflect.ValueOf(obj)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+		t = t.Elem()
+	}
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		if f.Kind() == reflect.Struct {
+			for j := 0; j < f.NumField(); j++ {
+				nm := snakeString(t.FieldByIndex([]int{i, j}).Name)
+				if p := query.Get(nm);p != ""{
+					condition[nm] = p
+				}
+			}
+			continue
+		}
+		s := t.Field(i)
+		nm := snakeString(s.Name)
+		if p := query.Get(nm);p != ""{
+			condition[nm] = p
+		}
+	}
+}
+func CheckUpdateCondition(m ResourceInterface, condition map[string]interface{}) {
+	v := reflect.ValueOf(m)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	for key, val := range condition {
+		old := v.FieldByName(camelString(key))
+		switch old.Kind() {
+		case reflect.String:
+			if old.String() != val {
+				panic(errors.New("forbid update by field:" + key))
+			}
+			break
+		case reflect.Int:
+			if old.Int() != int64(val.(int)) {
+				panic(errors.New("forbid update by field:" + key))
+			}
+			break
+		default:
+			panic(errors.New("forbid update by field type:" + old.Kind().String()))
+		}
+	}
 }

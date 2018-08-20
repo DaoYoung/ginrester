@@ -6,25 +6,23 @@ import (
 	"errors"
 )
 
-type BaseFields struct {
-	PkField
+type Model struct {
+	ID int `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
 }
-type PkField struct {
-	ID int `gorm:"primary_key" json:"id"`
-}
 
-func (bf PkField) ListFields() []string {
+func (bf Model) ListFields() []string {
 	return []string{"*"}
 }
-func (bf PkField) InfoFields() []string {
+func (bf Model) InfoFields() []string {
 	return bf.ListFields()
 }
-func (bf PkField) ForbidUpdateFields() []string {
+func (bf Model) ForbidUpdateFields() []string {
 	return SetForbidUpdateFields()
 }
+
 func SetForbidUpdateFields(fs ...string) []string {
 	res := []string{"id", "created_at", "updated_at", "deleted_at"}
 	for _, value := range fs {
@@ -58,14 +56,14 @@ func FindOneByMap(res ResourceInterface, where map[string]interface{}) ResourceI
 	if err := Db.Where(where).First(res).Error; err == nil {
 		return res
 	} else {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
 func FindListByMap(res interface{}, where map[string]interface{}, order string, page int, perPage int) {
 	offset := perPage * (page - 1)
 	if err := Db.Where(where).Order(order).Offset(offset).Limit(perPage).Find(res).Error; err != nil {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
@@ -73,7 +71,7 @@ func UpdateByID(id int, res ResourceInterface) ResourceInterface {
 	if err := Db.Model(res).Where("id = ?", id).Updates(res).Error; err == nil {
 		return FindOneByID(res, id)
 	} else {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
@@ -84,7 +82,7 @@ func UpdateWhere(where map[string]interface{}, res ResourceInterface) ResourceIn
 		}
 		return res
 	} else {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
@@ -92,7 +90,7 @@ func DeleteByID(res ResourceInterface, id int) ResourceInterface {
 	if err := Db.Where("id = ?", id).Delete(res).Error; err == nil {
 		return res
 	} else {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
@@ -100,7 +98,7 @@ func Create(res ResourceInterface) ResourceInterface {
 	if err := Db.Create(res).Error; err == nil {
 		return res
 	} else {
-		panic(QueryDaoError(err))
+		panic(err)
 	}
 }
 
