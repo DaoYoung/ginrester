@@ -24,8 +24,8 @@ type ControllerInterface interface {
 	ParentNode() ControllerInterface
 
 	Init(r ControllerInterface)
-	model() ResourceInterface
-	modelSlice() interface{}
+	GetModel() ResourceInterface
+	GetModelSlice() interface{}
 	parentController() ControllerInterface
 	beforeDelete(c *gin.Context, m ResourceInterface, id int)
 	afterDelete(c *gin.Context, m ResourceInterface, id int)
@@ -49,8 +49,8 @@ func (action *Controller) Init(r ControllerInterface){
 		panic(errors.New("param r: is not a controller"))
 	}
 	action.Rester = r
-	action.RestModel = r.model
-	action.RestModelSlice = r.modelSlice
+	action.RestModel = r.GetModel
+	action.RestModelSlice = r.GetModelSlice
 	action.ParentController = r.parentController()
 }
 func (action *Controller) ParentNode() ControllerInterface {

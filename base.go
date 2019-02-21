@@ -11,11 +11,11 @@ type BaseController struct{}
 func (this BaseController) Rester() {
 	panic(errors.New("can't find func:Rester in your controller"))
 }
-func (this BaseController) modelSlice() interface{} {
-	panic(errors.New("can't find func:modelSlice in your controller"))
+func (this BaseController) GetModelSlice() interface{} {
+	panic(errors.New("can't find func:GetModelSlice in your controller"))
 }
-func (this *BaseController) model() ResourceInterface {
-	panic(errors.New("can't find func:model in your controller"))
+func (this *BaseController) GetModel() ResourceInterface {
+	panic(errors.New("can't find func:GetModel in your controller"))
 }
 func (this *BaseController) parentController() ControllerInterface                           { return nil }
 func (this *BaseController) beforeCreate(c *gin.Context, m ResourceInterface)                     {}
